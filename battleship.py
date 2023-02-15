@@ -20,47 +20,68 @@ def main():
     # Show fake loading animation
     # loading_animation(5)
 
-    # Create player and PC ship grids
+    # Create player ship and cannonneer grid; create PC ship grid (PC doesn't need a visual grid to keep track of hits and misses)
     player_ship_grid = create_grid("ships")
     pc_ship_grid = create_grid("ships")
+    player_cannoneer_grid = create_grid("cannoneer")
     
     # Create player and PC ship boards
-    player_board_ships = Board_Ships(player_name, player_ship_grid)
-    pc_board_ships = Board_Ships("pc", pc_ship_grid)
-
-    print(player_board_ships)
-
+    player_ship_board = Board_Ships(player_name, player_ship_grid)
+    pc_ship_board = Board_Ships("PC", pc_ship_grid)
+    """
     # PLAYER SHIP BOARD: Prompt user to create ships on his board
     print("\n" + bold_on + f"Look at all that water, {player_name}! Let's fill your board with some ships." + bold_off)
     # Initially prints empty board in visual format 
     print_visual_grid(player_ship_grid) 
     # Creates ships and each time prints grid afterwards
-    player_board_ships.create_ship(5, "Carrier")
+    player_ship_board.create_ship(5, "Carrier")
     print_visual_grid(player_ship_grid) 
-    player_board_ships.create_ship(4, "Battleship")
+    player_ship_board.create_ship(4, "Battleship")
     print_visual_grid(player_ship_grid) 
-    player_board_ships.create_ship(3, "Cruiser")
+    player_ship_board.create_ship(3, "Cruiser")
     print_visual_grid(player_ship_grid) 
-    player_board_ships.create_ship(3, "Submarine")
+    player_ship_board.create_ship(3, "Submarine")
     print_visual_grid(player_ship_grid) 
-    player_board_ships.create_ship(2, "Destroyer")
+    player_ship_board.create_ship(2, "Destroyer")
     print_visual_grid(player_ship_grid) 
-
+    """
     # PC SHIP BOARD: Auto-generate ships
-    pc_board_ships.auto_generate_ship(5, "Carrier")
-    pc_board_ships.auto_generate_ship(4, "Battleship")
-    pc_board_ships.auto_generate_ship(3, "Cruiser")
-    pc_board_ships.auto_generate_ship(3, "Submarine")
-    pc_board_ships.auto_generate_ship(2, "Destroyer")
+    pc_ship_board.auto_generate_ship(5, "Carrier")
+    pc_ship_board.auto_generate_ship(4, "Battleship")
+    pc_ship_board.auto_generate_ship(3, "Cruiser")
+    pc_ship_board.auto_generate_ship(3, "Submarine")
+    pc_ship_board.auto_generate_ship(2, "Destroyer")
 
-
+    """
     print("Final player board:")
     print_visual_grid(player_ship_grid) 
-    print("Final PC board:")
-    print_visual_grid(pc_ship_grid)
-    print(pc_board_ships) 
-
-    ready = input(f"Well done! Are you ready to play, {player_name}? Type 'Yes' or 'No': ")
+    """
+    # Prompt user for game start and create cannoneer board to shoot and keep track of hits and misses
+    while True:
+        ready = input(f"\nAre you ready to play, {player_name}? Type 'Yes' or 'No': ").lower()
+        if ready == "yes":
+            # Create cannoneer objects with arguments: Opponent's grid (to check), cannoneer grid (only player), name (only player)
+            player_cannoneer_board = Board_Cannoneer(pc_ship_grid, player_cannoneer_grid, player_name)
+            pc_cannoneer_board = Board_Cannoneer(player_ship_grid)
+            break
+        elif ready == "no":
+            print("Well, please let me know when you are ...")
+            continue
+        else:
+            print("Watch what you're typing, scoundrel!")
+            continue
+    
+    # Print empty cannoneer board
+    time.sleep(1)
+    print("\nWater, nothing but water!")
+    time.sleep(1)
+    # Loop: Player and PC take turns shooting at the other's board
+    while True:
+        print(tabulate(player_cannoneer_grid, tablefmt="heavy_grid"))
+        player_cannoneer_board.shoot()
+        if player_cannoneer_board.sunk == 5:
+            print("Congratulations! You have sunk your opponent's fleet and win the game!")
+            break
 
 # Create empty grid for boards
 def create_grid(type_of_board):
@@ -73,11 +94,13 @@ def create_grid(type_of_board):
         key = [k for k, v in letters.items() if v == f"{i}"]
         grid[i][0] = key[0]
     
-    # Creates dictionary with key "ship" and value None if type of board is "ships"
-    if type_of_board == "ships":
-        for i in range(1,9):
-            for j in range(1,9):
+    # Creates dictionary with key "ship" and value None if type of board is "ships"; creates string of ~ (water) is type is "cannoneer"
+    for i in range(1,9):
+        for j in range(1,9):
+            if type_of_board == "ships":
                 grid[i][j] = {"ship": None}
+            elif type_of_board == "cannoneer":
+                grid[i][j] = "~"
 
     return grid
 

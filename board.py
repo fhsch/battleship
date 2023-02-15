@@ -1,8 +1,4 @@
 from tabulate import tabulate
-import re
-
-# Dictionary of letters (keys) and corresponding numbers (values) for field creation
-letters = {"A": "1", "B": "2", "C": "3", "D": "4", "E": "5", "F": "6", "G": "7", "H": "8"}
 
 # Board super class
 class Board:
