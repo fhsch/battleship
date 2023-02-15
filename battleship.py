@@ -80,7 +80,7 @@ def main():
         print(tabulate(player_cannoneer_grid, tablefmt="heavy_grid"))
         player_cannoneer_board.shoot()
         if player_cannoneer_board.sunk == 5:
-            print("Congratulations! You have sunk your opponent's fleet and win the game!")
+            print("\nCongratulations! You have sunk your opponent's fleet and win the game!")
             break
 
 # Create empty grid for boards

@@ -8,7 +8,9 @@ letters = {"A": "1", "B": "2", "C": "3", "D": "4", "E": "5", "F": "6", "G": "7",
 class Board_Cannoneer(Board):
     def __init__(self, opponent_grid, grid=None, name="PC"):
         super().__init__(name, grid)
+        # opponent's grid to be able to check for hits and misses
         self.opponent_grid = opponent_grid
+        # variables to keep track of hits
         self.sunk = 0
         self.carrier = 5
         self.battleship = 4
@@ -34,11 +36,10 @@ class Board_Cannoneer(Board):
             if self.opponent_grid[ch][no]["ship"] == None:
                 self.grid[ch][no] = "X"
                 break
-            # Marks square with ■ if a ship was hit; METHOD 1: updates ship's hit count, check if it was sunk; METHOD 2: Check if all ships are sunk -> ends the game
+            # Marks square with ■ if a ship was hit; METHOD 1: updates ship's hit count, check if it was sunk
             else:
                 self.grid[ch][no] = "■"
                 self.update_hit_count(ch, no)
-                self.check_game_end()
                 break
 
     # METHOD 1: Update hitcount and check for sunk ships
@@ -69,9 +70,5 @@ class Board_Cannoneer(Board):
                 if self.destroyer == 0:
                     self.sunk += 1
                     print(f"\nYou have sunk your opponent's Destroyer!")
-
-    # METHOD 2: Check if all ships were sunk
-    def check_game_end(self):
-        return self.sunk
             
             
