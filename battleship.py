@@ -26,7 +26,7 @@ class Board_Ships(Board):
     def __init__(self, name, grid):
         super().__init__(name, grid)
     
-    # Create ships of certain size and name
+    # Create ship of certain size and name
     def create_ship(self, size, ship_name):
         print(f"Create a {ship_name} that covers {size} squares.")
         # Loop until a valid ship is created
@@ -76,6 +76,44 @@ class Board_Ships(Board):
             # Print finished board with all ships and break out of the loop
             print_visual_grid(self.grid)
             break
+    
+    # Auto-generate ship of certain size and name in random position
+    def auto_generate_ship(self, size, ship_name): 
+        while True:
+            field_start_ch = random.randint(1, 8)
+            field_start_no = random.randint(1, 8)
+            direction = random.choice(["horizontal", "vertical"])
+
+            # Try ship from left to right if direction is "horizontal"
+            if direction == "horizontal":
+                # Create variables for end field according to size
+                field_end_ch = copy.copy(field_start_ch)
+                field_end_no = field_start_no + (size -1)
+                # Try again if end field is out of bounds (> 8):
+                if field_end_no > 8:
+                    continue
+                else:
+                    if(self.check_ship(field_start_ch, field_start_no, field_end_ch, field_end_no, self.grid, "right")):
+                            for i in range(field_start_no, field_end_no + 1):
+                                self.grid[field_start_ch][i]["ship"] = ship_name
+                            break
+
+                    else:
+                        continue
+            elif direction == "vertical":
+                # Create variables for end field according to size
+                field_end_ch = field_start_ch + (size -1)
+                field_end_no = copy.copy(field_start_no) 
+                # Try again if end field is out of bounds (> 8):
+                if field_end_ch > 8:
+                    continue
+                else:
+                    if(self.check_ship(field_start_ch, field_start_no, field_end_ch, field_end_no, self.grid, "down")):
+                            for i in range(field_start_ch, field_end_ch + 1):
+                                self.grid[i][field_start_no]["ship"] = ship_name
+                            break
+                    else:
+                        continue
 
     # Check if any squares are already occupied by other ships
     def check_ship(self, start_ch, start_no, end_ch, end_no, board, direction):
@@ -98,24 +136,40 @@ class Board_Canon:
 
 def main():
     # Start screen with name prompt returns player name
-    name = start_game()
+    player_name = start_game()
     # Show fake loading animation
-    loading_animation(5)
-    # Create grid
-    grid = create_grid("ships")
+    # loading_animation(5)
 
-    # Create board and change one square to test
-    board = Board_Ships(name, grid)
+    # Create player and PC ship grids
+    player_ship_grid = create_grid("ships")
+    pc_ship_grid = create_grid("ships")
+    
+    # Create player and PC ship boards
+    player_board_ships = Board_Ships(player_name, player_ship_grid)
+    pc_board_ships = Board_Ships("pc", pc_ship_grid)
 
-    print("\n" + bold_on + f"Hi {name}! Let's fill your board with some ships." + bold_off)
-    # Prints board in visual format 
-    print_visual_grid(grid) 
+    # PLAYER SHIP BOARD: Prompt user to create ships on his board
+    print("\n" + bold_on + f"Look at all that water, {player_name}! Let's fill your board with some ships." + bold_off)
+    # Initially prints empty board in visual format 
+    print_visual_grid(player_ship_grid) 
     # Creates ships
-    board.create_ship(5, "Carrier")
-    board.create_ship(4, "Battleship")
-    board.create_ship(3, "Cruiser")
-    board.create_ship(3, "Submarine")
-    board.create_ship(2, "Destroyer")
+    player_board_ships.create_ship(5, "Carrier")
+    player_board_ships.create_ship(4, "Battleship")
+    player_board_ships.create_ship(3, "Cruiser")
+    player_board_ships.create_ship(3, "Submarine")
+    player_board_ships.create_ship(2, "Destroyer")
+
+    # PC SHIP BOARD: Auto-generate ships
+    pc_board_ships.auto_generate_ship(5, "Carrier")
+    pc_board_ships.auto_generate_ship(4, "Battleship")
+    pc_board_ships.auto_generate_ship(3, "Cruiser")
+    pc_board_ships.auto_generate_ship(3, "Submarine")
+    pc_board_ships.auto_generate_ship(2, "Destroyer")
+
+    print("Final player board:")
+    print_visual_grid(player_ship_grid) 
+    print("Final PC board:")
+    print_visual_grid(pc_ship_grid) 
 
     ready = input(f"Well done! Are you ready to play, {name}? Type 'Yes' or 'No': ")
 
@@ -146,7 +200,7 @@ def print_visual_grid(grid):
     for i in range(1, 9):
         for j in range(1, 9):
             if grid[i][j]["ship"] != None:
-                grid_copy_to_print[i][j] = "■"
+                grid_copy_to_print[i][j] = square
             else:
                 grid_copy_to_print[i][j] = "~"
     # prints the tabulated visual form of the grid
@@ -163,6 +217,7 @@ def start_game():
 
 # Fake loading animation on game start
 def loading_animation(n):
+    print("")
     time.sleep(1)
     for i in range(1, n):
         time.sleep(1)
