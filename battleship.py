@@ -77,10 +77,12 @@ def main():
     # print("\nWater, nothing but water!")
     # time.sleep(1)
     # Loop: Player and PC take turns shooting at the other's board
+
     while True:
         print(tabulate(player_cannoneer_grid, tablefmt="heavy_grid"))
+        wait = input("wait")
         player_cannoneer_board.get_target_for_pc_and_shoot()
-        if player_cannoneer_board.sunk == 5:
+        if player_cannoneer_board.game_over():
             print("\nCongratulations! You have sunk your opponent's fleet and win the game!")
             break
 

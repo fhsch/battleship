@@ -50,18 +50,16 @@ class Board_Cannoneer(Board):
 
     # METHOD 2: Get valid square to shoot at for PC through algorithm
     def get_target_for_pc_and_shoot(self):
+            count = 0
             self.turn = "pc"
             # Generate random square if no ship has been hit, but hasn't been sunk yet
             if not self.last_hit:
                 while True:
-                    print("Stuck here?")
                     self.x = random.randint(1, 8)
                     self.y = random.randint(1, 8)
                      # Check if square has already been shot at
                     if self.grid[self.x][self.y] != "~":
-                        print("Stuck here?")
-                        continue
-                        
+                        continue        
                     else:
                         self.fire(self.x, self.y)
                         break
@@ -70,43 +68,36 @@ class Board_Cannoneer(Board):
                 while True:
                     # Try square on the right of the hit
                     if self.direction != "vertical" and self.y < 8 and self.grid[self.x][self.y + 1] == "~":
-                        print("1 rechts")
                         self.fire(self.x, self.y + 1)
                         break                 
                     # Try square on the left of the hit
                     elif self.direction != "vertical" and self.y > 1 and self.grid[self.x][self.y - 1] == "~":
-                        print("1 links")
                         self.fire(self.x, self.y - 1,)
                         break
                     # If there are already two hits and the direction is horizontal, try up to 3 more squares to the left
                     elif self.direction == "horizontal":
                         for i in [2, 3, 4]:
                             if self.grid[self.x][self.y - i] == "~":
-                                print(f"{i} nach links")
                                 self.fire(self.x, self.y - i)
                                 break
                         break      
                     # Try square above the hit
                     elif self.x > 1 and self.grid[self.x - 1][self.y] == "~":
-                        print("1 hoch")
                         self.fire(self.x - 1, self.y)
                         break
                     # Try square below the hit
                     elif self.x < 8 and self.grid[self.x + 1][self.y] == "~":
-                        print("1 runter")
                         self.fire(self.x + 1, self.y)
                         break
                     # If there are already two hits and the direction is vertical, try up to 3 more squares down
                     elif self.direction == "vertical":
                         for i in [2, 3, 4]:
                             if self.grid[self.x + i][self.y] == "~":
-                                print(f"{i} nach unten")
                                 self.fire(self.x + i, self.y)
                                 break
                         break      
                     else:
-                        print(self.x, self.y, self.direction)
-                        sys.exit("Something went wrong")
+                        break
                             
     # METHOD 3: Shoot if either player or PC has provided a valid square
     def fire(self, ch, no):
@@ -168,6 +159,14 @@ class Board_Cannoneer(Board):
                     self.last_hit = False
                     self.direction = None
                     print(f"\nYou have sunk your opponent's Destroyer!")
+
+        # Set last hit to True after all ships have been sunk to not get stuck in first loop
+        if self.sunk == 5:
+            self.last_hit = True
+
+    def game_over(self):    
+        if self.sunk == 5:
+            return True
             
         
             
