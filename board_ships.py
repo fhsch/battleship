@@ -71,7 +71,8 @@ class Board_Ships(Board):
             # Generate random start square and building direction
             square_start_ch = random.randint(1, 8)
             square_start_no = random.randint(1, 8)
-            direction = random.choice(["right", "down"])
+            # direction = random.choice(["right", "down"])
+            direction = "right"
 
             # Try ship from left to right if direction is "right"
             if direction == "right":

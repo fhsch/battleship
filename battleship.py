@@ -20,10 +20,11 @@ def main():
     # Show fake loading animation
     # loading_animation(5)
 
-    # Create player ship and cannonneer grid; create PC ship grid (PC doesn't need a visual grid to keep track of hits and misses)
+    # Create player and PC ship and cannonneer grids
     player_ship_grid = create_grid("ships")
     pc_ship_grid = create_grid("ships")
     player_cannoneer_grid = create_grid("cannoneer")
+    pc_cannoneer_grid = create_grid("cannoneer")
     
     # Create player and PC ship boards
     player_ship_board = Board_Ships(player_name, player_ship_grid)
@@ -60,9 +61,9 @@ def main():
     while True:
         ready = input(f"\nAre you ready to play, {player_name}? Type 'Yes' or 'No': ").lower()
         if ready == "yes":
-            # Create cannoneer objects with arguments: Opponent's grid (to check), cannoneer grid (only player), name (only player)
+            # Create cannoneer objects with arguments: Opponent's grid (to check), cannoneer grid, and name (only player)
             player_cannoneer_board = Board_Cannoneer(pc_ship_grid, player_cannoneer_grid, player_name)
-            pc_cannoneer_board = Board_Cannoneer(player_ship_grid)
+            pc_cannoneer_board = Board_Cannoneer(player_ship_grid, pc_cannoneer_grid)
             break
         elif ready == "no":
             print("Well, please let me know when you are ...")
@@ -72,13 +73,13 @@ def main():
             continue
     
     # Print empty cannoneer board
-    time.sleep(1)
-    print("\nWater, nothing but water!")
-    time.sleep(1)
+    # time.sleep(1)
+    # print("\nWater, nothing but water!")
+    # time.sleep(1)
     # Loop: Player and PC take turns shooting at the other's board
     while True:
         print(tabulate(player_cannoneer_grid, tablefmt="heavy_grid"))
-        player_cannoneer_board.shoot()
+        player_cannoneer_board.get_target_for_pc_and_shoot()
         if player_cannoneer_board.sunk == 5:
             print("\nCongratulations! You have sunk your opponent's fleet and win the game!")
             break
