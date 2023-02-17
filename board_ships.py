@@ -2,6 +2,7 @@ from board import Board
 import re
 import random
 import copy
+import sys
 
 # Dictionary of letters (keys) and corresponding numbers (values) to create squares on the board
 letters = {"A": "1", "B": "2", "C": "3", "D": "4", "E": "5", "F": "6", "G": "7", "H": "8"}
@@ -71,8 +72,7 @@ class Board_Ships(Board):
             # Generate random start square and building direction
             square_start_ch = random.randint(1, 8)
             square_start_no = random.randint(1, 8)
-            # direction = random.choice(["right", "down"])
-            direction = "right"
+            direction = random.choice(["right", "down"])
 
             # Try ship from left to right if direction is "right"
             if direction == "right":
