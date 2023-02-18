@@ -4,8 +4,8 @@ import random
 import copy
 import sys
 
-# Dictionary of letters (keys) and corresponding numbers (values) to create squares on the board
-letters = {"A": "1", "B": "2", "C": "3", "D": "4", "E": "5", "F": "6", "G": "7", "H": "8"}
+# Global Variables
+LETTERS = {"A": "1", "B": "2", "C": "3", "D": "4", "E": "5", "F": "6", "G": "7", "H": "8"}
 
 # Board_Ships (subclass of Board) to place PLAYER and PC ships
 class Board_Ships(Board):
@@ -13,14 +13,14 @@ class Board_Ships(Board):
         super().__init__(name, grid)
     
     # METHOD 1: Create a single ship of a certain size and name for PLAYER board
-    def create_ship(self, size, ship_name):
+    def create_ship(self, ship_name, size):
         print(f"Create a {ship_name} that covers {size} squares.")
         # Loop until a valid ship is created
         while True:
-            # Get start and end square from user, check validity and save x (number; no) and y (letter; ch) for both squares
+            # Get START and END square from PLAYER, check validity and save x (number; no) and y (letter; ch) for both squares
             squares = input(f"Please enter its first and last position from left to right (e. g. 'A1 to A4') or from top to bottom: (e. g. 'A2 to D4'): ")
             if matches := re.search(r"^(([A-H])([1-8])( to )?([A-H])([1-8]))$", squares, re.IGNORECASE):
-                square_start_ch, square_start_no, square_end_ch, square_end_no = int(letters[matches[2].upper()]), int(matches[3]), int(letters[matches[5].upper()]), int(matches[6])
+                square_start_ch, square_start_no, square_end_ch, square_end_no = int(LETTERS[matches[2].upper()]), int(matches[3]), int(LETTERS[matches[5].upper()]), int(matches[6])
             else:
                 # Prompt again if one of the given squares does not exist
                 print("At least one of the given squares doesn't exist.")
@@ -67,7 +67,7 @@ class Board_Ships(Board):
             break
     
     # METHOD 2: Auto-generate a single ship of certain size and name in random position for PC board
-    def auto_generate_ship(self, size, ship_name): 
+    def auto_generate_ship(self, ship_name, size): 
         while True:
             # Generate random start square and building direction
             square_start_ch = random.randint(1, 8)
