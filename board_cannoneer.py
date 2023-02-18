@@ -75,77 +75,56 @@ class Board_Cannoneer(Board):
                         self.fire(self.x, self.y)
                         break
             else:
-                # After a hit: Randomly shoot at one of the four squares adjacent to hit square; if direction is saved (two hits), try fields in direction
-                while True:
-                    # If there are two horizontal hits, randomly try to shoot at a square left/right in range 4 if it can be on the board and is empty
-                    if self.direction == "horizontal":
-                        # Variables to prevent one side to check further if non-empty square was detected
-                        go_right = True
-                        go_left = True
-                        # Sequentially check fields from one to a maximum of four fields away from last hit
-                        for i in [1, 2, 3, 4]:
-                            left_or_right= []
-                            # Save square to the right in a list if it is on the board and empty
-                            if (self.y + i and go_right == True) <= 8:
-                                if self.grid[self.x][self.y + i] == "":
-                                    left_or_right.append(self.y + i)
-                                else:
-                                    # Prevent loop in next iterations to check further to the right if a non-empty square is detected
-                                    go_right = False
-                            # Save square to the left in a list if it is on the board and empty
-                            if (self.y - i and go_left == True) >= 1:
-                                if self.grid[self.x][self.y - i] == "":
-                                    left_or_right.append(self.y - i)
-                                else:
-                                    # Prevent loop in next iterations to check further to the left if a non-empty square is detected
-                                    go_left = False
-                            
-                            # If there are squares that can be fired at to the left and/or right (list > 0), shuffle the list to randomize next shot
-                            if len(left_or_right) > 0:
-                                random.shuffle(left_or_right)
-                                # Try every square on the list: Break if one of them can be fired at
-                                for y_value in left_or_right:
-                                    if self.grid[self.x][y_value] == "":
-                                        self.fire(self.x, y_value)
-                                        break
-                                break      
-                            # Continue with square one step further from last hit in both directions if there was no shot                
-                        break    
+                # If there are two horizontal hits, find possible squares to the left and/or right and randomly fire at one of them
+                if self.direction == "horizontal":
+                    # Initialize empty list for squares to hit on both sides on each iteration
+                    left_or_right= []
+                    # Add first empty square on the right from last hit to the list; maximum distance 4 (Carrier)
+                    for r in [1, 2, 3, 4]: 
+                        # Save first empty square to the right to the list and end loop
+                        if (self.y + r) <= 8:
+                            if self.grid[self.x][self.y + r] == "":
+                                left_or_right.append(self.y + r)
+                                print(f"possible suqare to the right: {r}")
+                                break
+                    # Add first empty square on the left from last hit to the list; maximum distance 4 (Carrier)
+                    for l in [1, 2, 3, 4]: 
+                        # Save first empty square to the left to the list and end loop
+                        if (self.y - l) >= 1:
+                            if self.grid[self.x][self.y - l] == "":
+                                left_or_right.append(self.y - l)
+                                print(f"possible suqare to the left: {l}")
+                                break
+                        
+                    random.shuffle(left_or_right)
+                    # Fire at first value in the list
+                    self.fire(self.x, left_or_right[0])
 
-                    # If there are two horizontal hits, randomly try to shoot at a square above/below in range 4 if it can be on the board and is empty
-                    elif self.direction == "vertical":
-                        # Variables to prevent one side to check further if a non-empty square was detected
-                        go_down = True
-                        go_up = True
-                        # Sequentially check fields from one to a maximum of four fields away from last hit
-                        for i in [1, 2, 3, 4]:
-                            top_or_bottom = []
-                            # Save square below in a list if it is on the board and empty
-                            if (self.x + i and go_down == True) <= 8:
-                                if self.grid[self.x + i][self.y] == "":
-                                    top_or_bottom.append(self.x + i)
-                                else:
-                                    # Prevent loop in next iterations to check further down if a non-empty square is detected
-                                    go_down = False
-                            # Save square above in a list if it is on the board and empty
-                            if (self.x - i) and go_up == True >= 1:
-                                if self.grid[self.x - 1][self.y] == "":
-                                    top_or_bottom.append(self.x - i)
-                                else:
-                                    # Prevent loop in next iterations to check further up if a non-empty square is detected
-                                    go_up = False
+                # If there are two horizontal hits, randomly try to shoot at a square above/below in range 4 if it can be on the board and is empty
+                elif self.direction == "vertical":
+                    # Sequentially check fields from one to a maximum of four fields away from last hit
+                    for i in [1, 2, 3, 4]:
+                        print(f"Vertical iteration {i}")
+                        top_or_bottom = []
+                        # Save square below in a list if it is on the board and empty
+                        if (self.x + i) <= 8:
+                            if self.grid[self.x + i][self.y] == "":
+                                top_or_bottom.append(self.x + i)
+                        # Save square above in a list if it is on the board and empty
+                        if (self.x - i) >= 1:
+                            if self.grid[self.x - 1][self.y] == "":
+                                top_or_bottom.append(self.x - i)
 
-                            # If there are squares that can be fired at above/below (list > 0), shuffle the list to randomize next shot
-                            if len(top_or_bottom) > 0:
-                                random.shuffle(top_or_bottom)
-                                # Try every square on the list: Break if one of them can be fired at
-                                for x_value in top_or_bottom:
-                                    if self.grid[x_value][self.y] == "":
-                                        self.fire(x_value, self.y)
-                                        break
-                                break       
-                            # Continue with square one step further from last hit in both directions if there was no shot                 
-                        break     
+                        # If there are squares that can be fired at above/below (list > 0), shuffle the list to randomize next shot
+                        if len(top_or_bottom) > 0:
+                            random.shuffle(top_or_bottom)
+                            # Try every square on the list: Break if one of them can be fired at
+                            for x_value in top_or_bottom:
+                                if self.grid[x_value][self.y] == "":
+                                    self.fire(x_value, self.y)
+                                    break
+                            break       
+                        # Continue with square one step further from last hit in both directions if there was no shot                    
 
                     # If there is only ONE HIT (no direction), randomly select one of the four adjacent squares and shoot at it if it is EMPTY
                     else:
@@ -246,6 +225,7 @@ class Board_Cannoneer(Board):
     # METHOD 5: Check for sunk ships, and return number of total sunk ships
     def check_sunk(self, ship_name, ship_count):  
         if ship_count == 0:
+            print("sunk")
             self.sunk += 1
             if self.name == "PC":
                 self.last_hit = False
