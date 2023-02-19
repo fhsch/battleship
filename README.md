@@ -1,3 +1,4 @@
-# battleship
-
-This Battleship game is my final project for the CS50 Python course.
+# YOUR PROJECT TITLE
+#### Video Demo:  <URL HERE>
+#### Description:
+TODO

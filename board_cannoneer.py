@@ -28,7 +28,7 @@ class Board_Cannoneer(Board):
         self.cruiser = 3
         self.submarine = 3
         self.destroyer = 2
-        # Variables for auto-shooting (PC only)
+        # Variables for auto-shooting (PC only): Keep track of the last hit square and ship
         self.x = None
         self.y = None
         self.last_hit = None
@@ -43,7 +43,7 @@ class Board_Cannoneer(Board):
                 else:
                     self.pc_hit_tracker[i][j] = ""
 
-    # METHOD 1: Get valid square to shoot at from user input
+    # METHOD 1: Get valid square to shoot at from PLAYER input
     def get_target_from_player_and_shoot(self):
         while True:
             # Prompt for user input and check if it is a valid square
@@ -62,9 +62,10 @@ class Board_Cannoneer(Board):
             self.fire(ch, no)
             break
 
-    # METHOD 2: Get valid square to shoot at for PC through algorithm
+    # METHOD 2: Get valid square to shoot at for PC and run fire() function
     def get_target_for_pc_and_shoot(self):
             while True:
+                # Get random square if there is currently no LAST HIT and no DIRECTION stored
                 if not self.last_hit and self.direction == None:
                     while True:
                         self.x = random.randint(1, 8)
@@ -73,11 +74,12 @@ class Board_Cannoneer(Board):
                         if self.grid[self.x][self.y] != "":
                             continue        
                         else:
+                            # Shoot if square is valid
                             self.fire(self.x, self.y)
                             break
                     break
 
-                # If there is only ONE HIT (no direction), randomly select one of the four adjacent squares and shoot at it if it is EMPTY
+                # After FIRST HIT of a ship (no direction), randomly select one of the four adjacent EMPTY squares
                 elif self.last_hit == True and self.direction == None:
                     # Check if the four adjacent squares are EMPTY and within GRID and add them to a list for possible next shots
                     possible_squares_for_next_shot = []
@@ -89,7 +91,7 @@ class Board_Cannoneer(Board):
                         possible_squares_for_next_shot.append("top")
                     if self.x < 8 and self.grid[self.x + 1][self.y] == "":
                         possible_squares_for_next_shot.append("bottom")
-                    # Get random square direction from possible choices
+                    # Get random square from possible squares to shoot at if one exists (safety condition)
                     if len(possible_squares_for_next_shot) > 0:
                         square_after_hit = random.choice(possible_squares_for_next_shot)
                         # Shoot at adjacent square according to random choice
@@ -106,11 +108,12 @@ class Board_Cannoneer(Board):
                                 self.fire(self.x + 1, self.y)
                                 break
                     else:
+                        # Set LAST HIT to None and continue with random square if there is no EMPTY adjacent square (can happen if ships touch)
                         self.last_hit = None
 
-                # If there are two horizontal hits, find possible squares to the left and/or right and randomly fire at one of them
+                # If there are two or more horizontal hits, find possible squares to the left and/or right and randomly fire at one of them
                 elif self.last_hit == True and self.direction == "horizontal":
-                    # Initialize empty list for squares to hit on both sides on each iteration
+                    # Initialize empty list for ONE square to hit on both sides (if one exists) on each iteration
                     left_or_right= []
 
                     # Add first empty square on the right from last hit to the list; maximum distance 4 (Carrier)
@@ -118,44 +121,37 @@ class Board_Cannoneer(Board):
                         if (self.y + r) <= 8:
                             # Don't do anything if the first square to the right has already been fired at
                             if self.grid[self.x][self.y + r] == "X":
-                                print(f"First square to the right has already been fired at.")
                                 break
-                            # Save first empty square to the right to the list and end loop
+                            # Save first empty square on the right to the list and end loop
                             if self.grid[self.x][self.y + r] == "":  
                                 left_or_right.append(self.y + r)
-                                print(f"possible square to the right: {r}")
                                 break
 
                     # Add first empty square on the left from last hit to the list; maximum distance 4 (Carrier)
                     for l in [1, 2, 3, 4]: 
-                        # Save first empty square to the left to the list and end loop
+                        # Save first empty square on the left to the list and end loop
                         if (self.y - l) >= 1:
                             # Don't do anything if the first square to the left has already been fired at
                             if self.grid[self.x][self.y - l] == "X":
-                                print(f"First square to the left has already been fired at.")
                                 break
                             # Save first empty square to the left to the list and end loop
                             if self.grid[self.x][self.y - l] == "":
                                 left_or_right.append(self.y - l)
-                                print(f"possible square to the left: {l}")
                                 break
                     
-                    # Shuffle list to choose randomly from square to the left or right (if they exist)
+                    # Shuffle list to choose randomly from square on the left or right (if they exist)
                     random.shuffle(left_or_right)
-                    # Fire at first value in the list if there is one; otherwise change direction (adjacent ships)
+                    # Fire at first value in the list if there is one; otherwise change direction to None (safety feature for adjacent ships)
                     if len(left_or_right) > 0:
                         self.fire(self.x, left_or_right[0])
                         break
                     else:
                         self.direction = None
-                        print(len(left_or_right))
-                        print(self.direction)
-                        print(self.last_hit)
                     continue
 
-                # If there are two horizontal hits, randomly try to shoot at a square above/below in range 4 if it can be on the board and is empty
+                # If there are two or more vertical hits, find possible squares above/below and randomly fire at one of them
                 elif self.last_hit == True and self.direction == "vertical":
-                    # Initialize empty list for squares to hit on both sides on each iteration
+                    # Initialize empty list for ONE square to hit on both sides (if one exists) on each iteration
                     top_or_bottom = []
 
                     # Add first empty square on the bottom from last hit to the list; maximum distance 4 (Carrier)
@@ -164,12 +160,10 @@ class Board_Cannoneer(Board):
                         if (self.x + b) <= 8:
                             # Don't do anything if the first square below has already been fired at
                             if self.grid[self.x + b][self.y] == "X":
-                                print(f"First square below has already been fired at.")
                                 break
                             # Save first empty square below to the list and end loop
                             if self.grid[self.x + b][self.y] == "":
                                 top_or_bottom.append(self.x + b)
-                                print(f"possible square below: {b}")
                                 break
 
                     # Add first empty square above last hit to the list; maximum distance 4 (Carrier)
@@ -178,25 +172,20 @@ class Board_Cannoneer(Board):
                         if (self.x - t) >= 1:
                             # Don't do anything if the first square above has already been fired at
                             if self.grid[self.x - t][self.y] == "X":
-                                print(f"First square above has already been fired at.")
                                 break
                             # Save first empty square above to the list and end loop
                             if self.grid[self.x - t][self.y] == "":
                                 top_or_bottom.append(self.x - t)
-                                print(f"possible square above: {t}")
                                 break
 
                     # Shuffle list to choose randomly from square above or below (if they exist)
                     random.shuffle(top_or_bottom)
-                    # Fire at first value in the list if there is one; otherwise change direction (adjacent ships)
+                    # Fire at first value in the list if there is one; otherwise change direction to None (safety feature for adjacent ships)
                     if len(top_or_bottom) > 0:
                         self.fire(top_or_bottom[0], self.y)
                         break
                     else:
                         self.direction = None
-                        print(len(top_or_bottom))
-                        print(self.direction)
-                        print(self.last_hit)
                     continue
                             
     # METHOD 3: Shoot if either PLAYER or PC has provided a valid square
@@ -206,34 +195,28 @@ class Board_Cannoneer(Board):
         # Marks square with X if no ship was hit and prints miss
         if self.opponent_grid[ch][no]["ship"] == None:
             self.grid[ch][no] = "X"
-            # time.sleep(1)
+            time.sleep(1)
             if self.name == "PC":
                 # Marks PC miss on hit tracker
                 self.pc_hit_tracker[ch][no] = "X"
-                # print(f"... and hits no target on square {target}.")
-                # time.sleep(1)
+                print(f"... and hits no target on square {target}.")
+                time.sleep(1)
             else:
                 print(f"{self.name} hits no target on square {target}.")
-                # time.sleep(1)
+                time.sleep(1)
 
         # Mark square with ■ if a ship was hit -> METHOD 4: updates ship's hit count, check if it was sunk, and return number of total sunk ships
         else:
             self.grid[ch][no] = "■"
-            # time.sleep(1)
-            # print(figlet.renderText("HIT"), end="")
-            # time.sleep(1)
+            time.sleep(1)
+            print(figlet.renderText("HIT"), end="")
+            time.sleep(1)
             if self.name == "PC":
-                # Marks PC hit on hit tracker
+                # Marks PC hit on hit tracker and prints hit message for PC hit
                 self.pc_hit_tracker[ch][no] = "■"
-                # print(f"... and hits a target on square {target}.")
-                # time.sleep(1)
-            else:
-                # print(f"{self.name} hits a target on square {target}.")
-                # time.sleep(1)
-                ...
+                print(f"... and hits a target on square {target}.")
+                time.sleep(1)
 
-            # Updates hit position only for PC
-            if self.name == "PC":
                 # Save direction of ship on consecutive hits and update coordinates of last hit for PC
                 if self.last_hit == True:
                     if self.x == ch:
@@ -244,13 +227,20 @@ class Board_Cannoneer(Board):
                     self.y = no
                 # Mark that a ship was hit so next round in get_target_for_pc_and_shoot() new coordinates ARE NOT generated unless a ship is sunk; update coordinates
                 self.last_hit = True
-            # Runs function to update hit count and check for sunk ships
+               
+            else:
+                # Print hit message for PLAYER hit
+                print(f"{self.name} hits a target on square {target}.")
+                time.sleep(1)
+
+            # Run function to update hit count for PALYER or PC and check for sunk ships
             self.update_hit_count(ch, no)
 
     # METHOD 4: Update hit count
     def update_hit_count(self, ch, no):
         # Get ship name from hit square
         hit_ship = self.opponent_grid[ch][no]["ship"]
+        # Match hit ship, update it's hit count and run function to check whether it has been sunk
         match hit_ship:
             case "Carrier":
                 self.carrier -= 1
@@ -269,11 +259,13 @@ class Board_Cannoneer(Board):
                 self.check_sunk("Destroyer", self.destroyer)
 
     # METHOD 5: Check for sunk ships, and return number of total sunk ships
-    def check_sunk(self, ship_name, ship_count):  
-        if ship_count == 0:
-            print("sunk")
+    def check_sunk(self, ship_name, remaining_squares):  
+        if remaining_squares == 0:
+            # Update number of sunk ships if one of the ships has no remaining squares
             self.sunk += 1
+            # Print message for sunk ship
             if self.name == "PC":
+                # Update last_hit and direction (None) if PC sinks one of the player's ship
                 self.last_hit = False
                 self.direction = None
                 print(f"\nThe PC has sunk your {ship_name}!")
