@@ -8,6 +8,8 @@ This is a Python command-line game of BATTLESHIP. The player and the computer ta
 
 The game starts with a prompt for the player's name. Afterwards, they user has to place their ships on the board according to the [official rules](https://www.hasbro.com/common/instruct/battleship.pdf). After another prompt to start the game, the player begins by choosing the first square to shoot at. Hits are marked by a '■' and misses by an 'X'. Then, the PC takes its first shot. To remind the player where they initially placed their ships, undamaged squares of a ship are marked with a '▢". When a ship has been sunk, a message including the name of the destroyed ship is displayed. The PC and the player now take turns until one of them has destroyed the enemy's fleet.
 
+![alt text](https://github.com/fhsch/battleship/blob/[branch]/image.jpg?raw=true)
+
 #### PC functionality
 For the PC, both the placement of the ships and the shooting are handled automatically by the programm. The functionality is described in the following parts about the different program files.
 
